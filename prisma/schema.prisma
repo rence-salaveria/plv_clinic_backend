@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @unique @default(dbgenerated("uuid_generate_v4()"))
+  identifier String    @unique
+  userType   UserType  @default(PATIENT)
+  password   String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  Admin      Admin[]
+  Patient    Patient[]
+
+  @@map("users")
+}
+
+model Patient {
+  id          Int         @id @default(autoincrement())
+  userId      String
+  patientType PatientType @default(STUDENT)
+  firstName   String
+  lastName    String
+  idNumber    String      @unique
+  avatar      String?
+  birthday    DateTime
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        User        @relation(fields: [userId], references: [id])
+
+  @@map("patients")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  firstName String
+  lastName  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("admins")
+}
+
+enum UserType {
+  PATIENT
+  ADMIN
+  SUPERADMIN
+}
+
+enum PatientType {
+  STUDENT
+  FACULTY
+}
+
+enum HealthComplaints {
+  HEADACHE
+  DIZZINESS
+  FEVER
+  ABDOMINAL_PAIN
+  DYSMENORRHEA
+  HYPERACIDITY
+  LOSS_OF_CONSCIOUSNESS
+  COUGH_AND_COLDS
+  ANXIETY_ATTACK
+  DIFFICULTY_BREATHING
+  ALLERGY
+  TOOTHACHE
+  WOUND
+  SPRAIN
+  CHEST_PAIN
+  NAUSEA
+  BODY_MALAISE
+  HYPERVENTILATION
+  ANIMAL_BITE
+  BRUISES
+  EPISTAXIS
+  FRACTURE
+}
